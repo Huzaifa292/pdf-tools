@@ -214,14 +214,39 @@
         offset: 60,
     });
 
-    // Form submit pe spinner
+    // Form submit pe spinner dikhao
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function() {
             const btn = this.querySelector('button[type=submit]');
             if (btn) {
+                // Original text save karo taake baad mein restore kar sakein
+                btn.dataset.originalText = btn.innerHTML;
                 btn.innerHTML = '<span class="spinner"></span> Processing...';
                 btn.disabled = true;
             }
+        });
+    });
+
+    // Page load hone pe sab buttons reset karo
+    // (download complete hone ya error aane ke baad page wapas aata hai)
+    window.addEventListener('pageshow', function(e) {
+        // pageshow event tab bhi fire hota hai jab browser back/forward cache se page show kare
+        document.querySelectorAll('button[type=submit]').forEach(btn => {
+            if (btn.dataset.originalText) {
+                btn.innerHTML = btn.dataset.originalText;
+                btn.disabled  = false;
+                delete btn.dataset.originalText;
+            } else if (btn.disabled) {
+                // Agar original text save nahi tha to sirf enable karo
+                btn.disabled = false;
+            }
+        });
+    });
+
+    // Extra safety: agar page already load ho chuka hai aur button stuck ho
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('button[type=submit]').forEach(btn => {
+            btn.disabled = false;
         });
     });
 </script>
