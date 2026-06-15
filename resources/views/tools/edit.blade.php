@@ -1381,76 +1381,98 @@ async function downloadPdf(){
     for(let p = 1; p <= totP; p++){
         const page = await pdfDoc.getPage(p);
         const vp   = page.getViewport({ scale: SCALE });
-        const cv   = document.createElement('canvas');
-        cv.width   = vp.width;
-        cv.height  = vp.height;
-        const ctx  = cv.getContext('2d');
+
+        const cv  = document.createElement('canvas');
+        cv.width  = vp.width;
+        cv.height = vp.height;
+        const ctx = cv.getContext('2d');
+
+        // PDF render
         await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
-        /* ── Text edits ── */
-        (store[p]||[]).forEach(d => {
-            if(!d.mod) return;
+        // Koi modified text hai?
+        const mods = (store[p]||[]).filter(d => d.mod);
 
+        mods.forEach(d => {
             ctx.save();
+
+            // Exact font set karo
             let fnt = '';
             if(d.italic) fnt += 'italic ';
             if(d.bold)   fnt += 'bold ';
             fnt += d.fs + 'px ' + d.ff;
-            ctx.font = fnt;
+            ctx.font        = fnt;
+            ctx.textBaseline = 'alphabetic';
 
-            const measuredW = Math.max(ctx.measureText(d.orig || d.txt).width, d.w) + 12;
+            // Original aur new text ki width
+            const oW = ctx.measureText(d.orig || '').width;
+            const nW = ctx.measureText(d.txt  || '').width;
 
-            // White out original
+            // PDF text ka exact bounding box calculate karo
+            // PDF mein text ka top = baseline - ascent
+            // ascent approx = 0.72 * fontSize
+            // descent approx = 0.22 * fontSize
+            const ascent  = d.fs * 0.72;
+            const descent = d.fs * 0.22;
+
+            // White out rect — sirf text area, 1px tight
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(d.x - 2, d.y - d.fs * 1.1, measuredW, d.fs * 1.3);
+            ctx.fillRect(
+                d.x,
+                d.y - ascent,
+                Math.max(oW, nW) + 1,
+                ascent + descent
+            );
 
-            // Draw new text at baseline
-            if(d.txt.trim()){
-                ctx.fillStyle    = d.color || '#000000';
-                ctx.textBaseline = 'alphabetic';
+            // Naya text draw karo
+            if(d.txt && d.txt.trim()){
+                ctx.fillStyle = d.color || '#000000';
                 ctx.fillText(d.txt, d.x, d.y);
             }
+
             ctx.restore();
         });
 
-        /* ── Annotations ── */
+        // Annotations
         (annStore[p]||[]).forEach(ann => {
             ctx.save();
             if(ann.type === 'highlight'){
-                ctx.fillStyle = ann.color || 'rgba(250,204,21,.5)';
+                ctx.fillStyle   = ann.color || 'rgba(250,204,21,.45)';
                 ctx.fillRect(ann.x, ann.y, ann.w, ann.h);
-            } else if(ann.type === 'text'){
+            } else if(ann.type === 'text' && ann.text){
                 let fnt = '';
                 if(ann.italic) fnt += 'italic ';
                 if(ann.bold)   fnt += 'bold ';
-                fnt += ann.fontSize + 'px ' + (ann.fontFamily || 'Arial');
+                fnt += (ann.fontSize||14) + 'px ' + (ann.fontFamily||'Arial');
                 ctx.font         = fnt;
                 ctx.fillStyle    = ann.color || '#000';
                 ctx.textBaseline = 'top';
-                ctx.fillText(ann.text || '', ann.x, ann.y);
+                ctx.fillText(ann.text, ann.x, ann.y);
             }
             ctx.restore();
         });
 
-        /* ── Drawings ── */
+        // Drawings
         if(drawStore[p]){
             await new Promise(res => {
-                const img = new Image();
-                img.onload = () => { ctx.drawImage(img, 0, 0); res(); };
-                img.src    = drawStore[p];
+                const img   = new Image();
+                img.onload  = () => { ctx.drawImage(img, 0, 0); res(); };
+                img.src     = drawStore[p];
             });
         }
 
-        const imgData = cv.toDataURL('image/jpeg', 1.0);
-        if(!pdf) pdf = new jsPDF({ unit: 'pt', format: [vp.width, vp.height] });
+        // PNG — no compression artifacts
+        const imgData = cv.toDataURL('image/png');
+        if(!pdf) pdf = new jsPDF({ unit:'pt', format:[vp.width, vp.height] });
         else     pdf.addPage([vp.width, vp.height]);
-        pdf.addImage(imgData, 'JPEG', 0, 0, vp.width, vp.height);
+        pdf.addImage(imgData, 'PNG', 0, 0, vp.width, vp.height);
     }
 
     hideSpinner();
     const fn = document.getElementById('file-name-input').value.trim() || 'edited';
     pdf.save(fn.endsWith('.pdf') ? fn : fn + '.pdf');
 }
+
 </script>
 </body>
 </html>
