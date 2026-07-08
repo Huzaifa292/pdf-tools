@@ -442,6 +442,10 @@ $toolCategories = [
 
     // Global AJAX form submit controller
     window.submitFormAjax = async function(formElement) {
+        if (typeof toolType !== 'undefined' && ['merge', 'split', 'rotate', 'remove-pages'].includes(toolType)) {
+            return await handleClientSideProcessing(formElement);
+        }
+
         const spinner = document.getElementById('spinner');
         const spinnerText = document.getElementById('spinner-text');
         
@@ -503,6 +507,121 @@ $toolCategories = [
             alert("Error: " + error.message);
         }
     };
+
+    // Client-side processing using pdf-lib
+    window.handleClientSideProcessing = async function(formElement) {
+        const spinner = document.getElementById('spinner');
+        const spinnerText = document.getElementById('spinner-text');
+        
+        spinner.classList.remove('hidden');
+        spinner.classList.add('flex');
+        spinnerText.textContent = "Processing Privately on your Device...";
+
+        try {
+            const formData = new FormData(formElement);
+            const PDFDocument = PDFLib.PDFDocument;
+            const degrees = PDFLib.degrees;
+            
+            let resultPdfBytes;
+            let filename = 'processed.pdf';
+
+            if (toolType === 'merge') {
+                const files = formElement.querySelector('input[type="file"]').files;
+                if (!files || files.length === 0) throw new Error("No files selected");
+                
+                const mergedPdf = await PDFDocument.create();
+                for (let i = 0; i < files.length; i++) {
+                    spinnerText.textContent = `Merging file ${i+1} of ${files.length}...`;
+                    const fileBytes = await files[i].arrayBuffer();
+                    const pdf = await PDFDocument.load(fileBytes);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+                resultPdfBytes = await mergedPdf.save();
+                filename = 'merged_document.pdf';
+
+            } else if (toolType === 'rotate') {
+                const file = formElement.querySelector('input[type="file"]').files[0];
+                const angle = parseInt(formData.get('angle') || '90');
+                
+                const fileBytes = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(fileBytes);
+                const pages = pdf.getPages();
+                pages.forEach(page => {
+                    page.setRotation(degrees(page.getRotation().angle + angle));
+                });
+                resultPdfBytes = await pdf.save();
+                filename = 'rotated_document.pdf';
+
+            } else if (toolType === 'split' || toolType === 'remove-pages') {
+                const file = formElement.querySelector('input[type="file"]').files[0];
+                const pagesStr = formData.get('pages') || '';
+                
+                const fileBytes = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(fileBytes);
+                const totalPages = pdf.getPageCount();
+                
+                // Parse pages string into array of 0-based indices
+                let targetPages = [];
+                if (pagesStr.trim() !== '') {
+                    const parts = pagesStr.split(',');
+                    parts.forEach(part => {
+                        if (part.includes('-')) {
+                            const range = part.split('-');
+                            let start = parseInt(range[0]);
+                            let end = parseInt(range[1]);
+                            if (!isNaN(start) && !isNaN(end)) {
+                                for (let i = start; i <= end; i++) targetPages.push(i - 1);
+                            }
+                        } else {
+                            let p = parseInt(part);
+                            if (!isNaN(p)) targetPages.push(p - 1);
+                        }
+                    });
+                } else {
+                    for(let i=0; i<totalPages; i++) targetPages.push(i); // all pages
+                }
+                
+                targetPages = [...new Set(targetPages)].filter(p => p >= 0 && p < totalPages).sort((a,b) => a-b);
+                
+                if (toolType === 'remove-pages') {
+                    // Invert selection: we keep pages that are NOT in targetPages
+                    // Wait, the input in remove-pages says "Pages to Keep", but wait...
+                    // Let's check the HTML. remove-pages.blade.php says "Pages to Keep" so targetPages are the pages to keep!
+                    // Okay, so in both split and remove-pages, targetPages are the pages to KEEP!
+                    // Wait, let's just create a new document with the pages to keep.
+                }
+
+                if (targetPages.length === 0) {
+                    throw new Error("No pages selected to extract/keep.");
+                }
+
+                const newPdf = await PDFDocument.create();
+                const copiedPages = await newPdf.copyPages(pdf, targetPages);
+                copiedPages.forEach((page) => newPdf.addPage(page));
+                resultPdfBytes = await newPdf.save();
+                filename = toolType === 'split' ? 'split_document.pdf' : 'modified_document.pdf';
+            }
+
+            spinnerText.textContent = "Generating Download...";
+            
+            const blob = new Blob([resultPdfBytes], { type: 'application/pdf' });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Hide spinner
+            spinner.classList.remove('flex');
+            spinner.classList.add('hidden');
+
+            // Render download stage inside the tool page
+            renderDownloadPanel(blobUrl, filename, blob.size);
+
+        } catch (error) {
+            spinner.classList.remove('flex');
+            spinner.classList.add('hidden');
+            alert("Client-Side Processing Error: " + error.message);
+        }
+    };
+
 
     function renderDownloadPanel(blobUrl, filename, fileSize) {
         const mainContainer = document.querySelector('main > div');
