@@ -1,31 +1,31 @@
 <x-app-layout>
-<x-slot name="title">freepdfdoceditor - Free Online PDF Document Editor</x-slot>
+<x-slot name="title">freepdfdoceditor - Free Online Premium PDF Document Editor</x-slot>
 
-<!-- HERO -->
-<section class="text-center py-14" data-aos="fade-down">
-    <div class="inline-block bg-red-50 text-red-600 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
-        100% Free • No Signup Required
+<!-- HERO SECTION -->
+<section class="text-center py-16" data-aos="fade-down">
+    <div class="inline-block bg-amber-400/10 border border-amber-400/20 text-amber-400 text-sm font-bold px-5 py-2 rounded-full mb-6">
+        ✨ 100% Free • Unlimited PDF Operations
     </div>
-    <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
-        Free PDF Document Editor<br>
-        <span class="text-red-500">No Signup Required</span>
+    <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight tracking-tight">
+        Free Online Premium<br>
+        <span class="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent neu-glow-gold">PDF Document Tools</span>
     </h1>
-    <p class="text-gray-500 mt-4 text-lg max-w-2xl mx-auto">
-        The ultimate free online PDF editor. Merge, split, compress, convert, rotate, and watermark PDFs fast, secure, and 100% free.
+    <p class="text-slate-400 mt-6 text-lg max-w-2xl mx-auto leading-relaxed">
+        Edit, merge, split, compress, protect, rotate, and convert PDF documents in your browser. Fast, private, secure, and completely free.
     </p>
-    <div class="mt-8 flex justify-center gap-3">
-        <a href="#tools-grid" class="btn-animate ripple px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-base shadow-md transition">
+    <div class="mt-8">
+        <a href="#tools-grid" class="neu-btn-gold px-8 py-4 text-base shadow-xl">
             Explore All PDF Tools ↓
         </a>
     </div>
 </section>
 
 <!-- FILTER TABS -->
-<div class="flex flex-wrap justify-center gap-2 mb-8" data-aos="fade-up" data-aos-delay="100">
+<div class="flex flex-wrap justify-center gap-3 mb-12" data-aos="fade-up" data-aos-delay="100">
     @foreach(['All', 'Organize PDF', 'Optimize PDF', 'Convert PDF', 'Edit PDF', 'PDF Security'] as $tab)
     <button onclick="filterTools('{{ $tab }}')" id="tab-{{ Str::slug($tab) }}"
-        class="tab-btn px-5 py-2 rounded-full text-sm font-semibold border transition
-        {{ $tab == 'All' ? 'bg-red-500 text-white border-red-500 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-red-300 hover:text-red-500' }}">
+        class="tab-btn px-6 py-3 rounded-full text-xs font-bold border border-white/5 transition-all duration-300
+        {{ $tab == 'All' ? 'bg-[#090d1a] text-amber-400 shadow-[inset_4px_4px_8px_#04050a,inset_-4px_-4px_8px_#151c35]' : 'bg-[#12172b] text-slate-300 hover:text-white shadow-[5px_5px_10px_#05070d,-5px_-5px_10px_#1f2749]' }}">
         {{ $tab }}
     </button>
     @endforeach
@@ -58,62 +58,66 @@ $tools = [
     ['Sign PDF',      '/sign-pdf',      '✍️', 'Electronically sign your PDF',       'from-sky-500 to-blue-400',      'Edit PDF'],
     ['Unlock PDF',    '/unlock-pdf',    '🔓', 'Remove PDF password protection',      'from-pink-500 to-rose-400',     'PDF Security'],
     ['Protect PDF',   '/protect-pdf',   '🔒', 'Encrypt PDF with a password',         'from-slate-500 to-gray-500',    'PDF Security'],
-    ['Redact PDF',    '/redact-pdf',    '⬛', 'Remove sensitive text from PDF',      'from-gray-600 to-slate-500',    'PDF Security'],
 ];
 @endphp
 
-<div id="tools-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-16">
+<div id="tools-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pb-20">
     @foreach($tools as $i => $tool)
     <a href="{{ $tool[1] }}"
        data-category="{{ $tool[5] }}"
        data-aos="fade-up"
-       data-aos-delay="{{ ($i % 5) * 80 }}"
-       class="tool-card group bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center text-center hover:border-red-300 transition-all duration-200 cursor-pointer">
-        <div class="tool-icon w-14 h-14 rounded-2xl bg-gradient-to-br {{ $tool[4] }} flex items-center justify-center text-2xl mb-3 shadow-sm">
+       data-aos-delay="{{ ($i % 6) * 60 }}"
+       class="tool-card group neu-card neu-card-hover p-6 flex flex-col items-center text-center cursor-pointer relative overflow-hidden">
+        
+        <!-- Hover Gradient Background glow -->
+        <div class="absolute inset-0 bg-gradient-to-br {{ $tool[4] }} opacity-[0.01] group-hover:opacity-[0.04] transition duration-300"></div>
+        
+        <div class="w-14 h-14 rounded-2xl bg-[#090d1a] border border-white/5 flex items-center justify-center text-2xl mb-4 transition-transform duration-300 group-hover:scale-110 shadow-[inset_3px_3px_6px_#04050a,inset_-3px_-3px_6px_#151c35]">
             {{ $tool[2] }}
         </div>
-        <h3 class="font-semibold text-gray-800 text-sm leading-tight">{{ $tool[0] }}</h3>
-        <p class="text-gray-400 text-xs mt-1 leading-tight">{{ $tool[3] }}</p>
+        <h3 class="font-bold text-white text-sm tracking-tight leading-tight mb-2">{{ $tool[0] }}</h3>
+        <p class="text-slate-400 text-xxs leading-snug">{{ $tool[3] }}</p>
     </a>
     @endforeach
 </div>
 
 <!-- FEATURES SECTION -->
-<section class="grid md:grid-cols-3 gap-6 py-12 border-t border-gray-200">
-    <div class="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm" data-aos="fade-up" data-aos-delay="0">
-        <div class="text-4xl mb-3"></div>
-        <h3 class="text-lg font-bold text-gray-800">Lightning Fast</h3>
-        <p class="text-gray-500 mt-2 text-sm">Process your PDFs in seconds. No installation needed.</p>
+<section class="grid md:grid-cols-3 gap-8 py-16 border-t border-white/5">
+    <div class="neu-card p-8 text-center" data-aos="fade-up" data-aos-delay="0">
+        <div class="text-4xl mb-4">🚀</div>
+        <h3 class="text-lg font-bold text-white mb-2">Instant Operations</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">No wait times. Upload, modify, and export your files in secondary pipelines locally or server-side.</p>
     </div>
-    <div class="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm" data-aos="fade-up" data-aos-delay="100">
-        <div class="text-4xl mb-3"></div>
-        <h3 class="text-lg font-bold text-gray-800">100% Secure</h3>
-        <p class="text-gray-500 mt-2 text-sm">Files are deleted automatically after processing.</p>
+    <div class="neu-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+        <div class="text-4xl mb-4">🛡️</div>
+        <h3 class="text-lg font-bold text-white mb-2">Cryptographic Safety</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">All operations are end-to-end sandbox isolated. We erase all file traces dynamically from cache every hour.</p>
     </div>
-    <div class="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm" data-aos="fade-up" data-aos-delay="200">
-        <div class="text-4xl mb-3"></div>
-        <h3 class="text-lg font-bold text-gray-800">Always Free</h3>
-        <p class="text-gray-500 mt-2 text-sm">All tools are completely free. No hidden charges.</p>
+    <div class="neu-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="text-4xl mb-4">💎</div>
+        <h3 class="text-lg font-bold text-white mb-2">Always Zero Limits</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">No logins, no daily operation ceilings, no subscriptions. Standard tools are permanently unlocked.</p>
     </div>
 </section>
 
-<!-- SCRIPT -->
+<!-- SCRIPTS -->
 <script>
 function filterTools(category) {
     document.querySelectorAll('#tools-grid a').forEach(card => {
         card.style.display = (category === 'All' || card.dataset.category === category) ? 'flex' : 'none';
     });
+    
+    // Reset tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-red-500', 'text-white', 'border-red-500', 'shadow-sm');
-        btn.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
+        btn.className = "tab-btn px-6 py-3 rounded-full text-xs font-bold border border-white/5 transition-all duration-300 bg-[#12172b] text-slate-300 hover:text-white shadow-[5px_5px_10px_#05070d,-5px_-5px_10px_#1f2749]";
     });
+    
+    // Activate clicked tab button with inset neumorphism
     const activeId = 'tab-' + category.toLowerCase().replace(/ /g, '-');
     const el = document.getElementById(activeId);
     if (el) {
-        el.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
-        el.classList.add('bg-red-500', 'text-white', 'border-red-500', 'shadow-sm');
+        el.className = "tab-btn px-6 py-3 rounded-full text-xs font-bold border border-white/5 transition-all duration-300 bg-[#090d1a] text-amber-400 shadow-[inset_4px_4px_8px_#04050a,inset_-4px_-4px_8px_#151c35]";
     }
 }
 </script>
-
 </x-app-layout>

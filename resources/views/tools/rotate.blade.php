@@ -1,25 +1,31 @@
-<x-app-layout>
-<x-slot name="title">Rotate PDF - PDFTools</x-slot>
-<div class="max-w-2xl mx-auto text-center py-10">
-    <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center text-4xl mx-auto mb-6 shadow-xl">🔄</div>
-    <h1 class="text-4xl font-extrabold text-white">Rotate PDF</h1>
-    <p class="text-slate-400 mt-3 text-lg">Rotate your PDF pages to any angle.</p>
-    @if(session('error'))<div class="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-xl text-red-400 text-sm">{{ session('error') }}</div>@endif
-    <form method="POST" action="/rotate-pdf" enctype="multipart/form-data" class="mt-8">
-        @csrf
-        <label class="block border-2 border-dashed border-slate-600 hover:border-red-400 rounded-2xl p-10 cursor-pointer transition-colors">
-            <input type="file" name="files[]" accept=".pdf" multiple class="hidden" onchange="document.getElementById('fn').textContent='✅ Selected '+this.files.length+' file(s)'" required>
-            <div class="text-5xl mb-3">📁</div>
-            <p class="text-slate-300 font-semibold">Click to select PDF</p>
-            <div id="fn" class="mt-3 text-sm text-green-400"></div>
+@php
+$extraFields = '
+<div class="mt-4 text-left">
+    <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Rotation Angle</label>
+    <div class="flex justify-around bg-slate-900 border border-white/5 p-3 rounded-2xl">
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-300">
+            <input type="radio" name="angle" value="90" checked class="accent-amber-400" onchange="rotateAllPages(90)"> ↻ 90°
         </label>
-        <div class="mt-4 flex justify-center gap-6">
-            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="angle" value="90" checked class="accent-red-500"><span class="text-white font-semibold">↻ 90°</span></label>
-            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="angle" value="180" class="accent-red-500"><span class="text-white font-semibold">↕ 180°</span></label>
-            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="angle" value="270" class="accent-red-500"><span class="text-white font-semibold">↺ 270°</span></label>
-        </div>
-        <button type="submit" class="mt-6 w-full py-4 bg-red-500 hover:bg-red-600 rounded-2xl font-bold text-white text-lg transition">Rotate PDF ↓</button>
-    </form>
-    <p class="text-slate-600 text-xs mt-4">🔒 Files are deleted automatically after processing</p>
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-300">
+            <input type="radio" name="angle" value="180" class="accent-amber-400" onchange="rotateAllPages(180)"> ↕ 180°
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-300">
+            <input type="radio" name="angle" value="270" class="accent-amber-400" onchange="rotateAllPages(270)"> ↺ 270°
+        </label>
+    </div>
 </div>
-</x-app-layout>
+';
+@endphp
+
+@include('tools._upload_form', [
+    'title' => 'Rotate PDF',
+    'desc' => 'Rotate one or multiple PDF pages easily. See preview updates in real-time.',
+    'icon' => '🔄',
+    'action' => '/rotate-pdf',
+    'multiple' => true,
+    'accept' => '.pdf',
+    'btnText' => 'Rotate PDF',
+    'gradient' => 'from-purple-500 to-violet-500',
+    'extraFields' => $extraFields,
+    'toolType' => 'rotate'
+])

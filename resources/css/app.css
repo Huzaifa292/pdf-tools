@@ -1,3 +1,198 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ══════════════════════════════
+   ROYAL NEUMORPHIC GLOBAL SYSTEMS
+   ══════════════════════════════ */
+:root {
+    --neu-bg: #0c0f1d;
+    --neu-card-bg: #12172b;
+    --neu-card-shadow-dark: #05070d;
+    --neu-card-shadow-light: #1f2749;
+    --royal-gold: #fbbf24;
+    --royal-gold-hover: #d97706;
+    --royal-purple: #8b5cf6;
+    --royal-blue: #3b82f6;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+}
+
+body {
+    background-color: var(--neu-bg) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--neu-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--neu-card-shadow-light);
+    border-radius: 999px;
+    border: 2px solid var(--neu-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--royal-purple);
+}
+
+/* ── NEUMORPHIC ELEMENTS ── */
+.neu-bg {
+    background-color: var(--neu-bg);
+}
+
+.neu-card {
+    background: var(--neu-card-bg);
+    box-shadow: 10px 10px 20px var(--neu-card-shadow-dark), 
+                -10px -10px 20px var(--neu-card-shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 14px 14px 28px var(--neu-card-shadow-dark), 
+                -14px -14px 28px var(--neu-card-shadow-light);
+    border-color: rgba(251, 191, 36, 0.15);
+}
+
+.neu-card-inset {
+    background: var(--neu-bg);
+    box-shadow: inset 6px 6px 12px var(--neu-card-shadow-dark), 
+                inset -6px -6px 12px var(--neu-card-shadow-light);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
+/* ── NEUMORPHIC BUTTONS ── */
+.neu-btn {
+    background: var(--neu-card-bg);
+    color: var(--text-primary);
+    box-shadow: 5px 5px 10px var(--neu-card-shadow-dark), 
+                -5px -5px 10px var(--neu-card-shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    outline: none;
+}
+.neu-btn:hover {
+    color: #ffffff;
+    box-shadow: 3px 3px 6px var(--neu-card-shadow-dark), 
+                -3px -3px 6px var(--neu-card-shadow-light);
+    transform: translateY(-1px);
+}
+.neu-btn:active, .neu-btn.active {
+    box-shadow: inset 4px 4px 8px var(--neu-card-shadow-dark), 
+                inset -4px -4px 8px var(--neu-card-shadow-light);
+    transform: translateY(1px);
+}
+.neu-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Gold Accent Button */
+.neu-btn-gold {
+    background: linear-gradient(135deg, var(--royal-gold) 0%, var(--royal-gold-hover) 100%);
+    color: #05070d;
+    box-shadow: 4px 4px 10px rgba(251, 191, 36, 0.15), 
+                5px 5px 10px var(--neu-card-shadow-dark), 
+                -5px -5px 10px var(--neu-card-shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    outline: none;
+}
+.neu-btn-gold:hover {
+    background: linear-gradient(135deg, #fde047 0%, var(--royal-gold) 100%);
+    box-shadow: 6px 6px 15px rgba(251, 191, 36, 0.25), 
+                3px 3px 6px var(--neu-card-shadow-dark), 
+                -3px -3px 6px var(--neu-card-shadow-light);
+    transform: translateY(-1px);
+}
+.neu-btn-gold:active {
+    background: linear-gradient(135deg, var(--royal-gold-hover) 0%, #b45309 100%);
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.4);
+    transform: translateY(1px);
+}
+
+/* ── NEUMORPHIC INPUTS ── */
+.neu-input {
+    background: #090d1a !important;
+    color: var(--text-primary) !important;
+    box-shadow: inset 4px 4px 8px #04050a, 
+                inset -4px -4px 8px #151c35 !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 10px 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.neu-input:focus {
+    border-color: var(--royal-gold) !important;
+    box-shadow: inset 4px 4px 8px #04050a, 
+                inset -4px -4px 8px #151c35,
+                0 0 0 1px rgba(251, 191, 36, 0.2) !important;
+}
+
+/* ── OTHER NEUMORPHIC CLASSES ── */
+.neu-glow-gold {
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+.neu-glow-purple {
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+
+/* Draggable helper styles */
+.draggable-thumbnail {
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.draggable-thumbnail:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+.drag-over {
+    border: 2px dashed var(--royal-gold) !important;
+    background: rgba(251, 191, 36, 0.05) !important;
+}
+
+/* Watermark draggable block overlay */
+#watermark-drag-helper {
+    position: absolute;
+    border: 2px dashed var(--royal-gold);
+    background: rgba(251, 191, 36, 0.2);
+    color: #ffffff;
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: move;
+    user-select: none;
+    z-index: 10;
+    pointer-events: auto;
+    border-radius: 4px;
+    display: none;
+}
+

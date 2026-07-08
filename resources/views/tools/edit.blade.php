@@ -4,21 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Edit PDF - SMART PDF Tools</title>
+    <title>Edit PDF - freepdfdoceditor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>window.Alpine = { start: () => {} };</script>
     <style>
+        :root {
+            --neu-bg: #0c0f1d;
+            --neu-card-bg: #12172b;
+            --neu-card-shadow-dark: #05070d;
+            --neu-card-shadow-light: #1f2749;
+            --royal-gold: #fbbf24;
+            --royal-gold-hover: #d97706;
+            --royal-purple: #8b5cf6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
         html, body {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
+            background-color: var(--neu-bg);
+            color: var(--text-primary);
         }
         *, *::before, *::after { box-sizing: border-box; }
 
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--neu-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--neu-card-shadow-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--royal-gold); }
+
         /* ══════════════════════════════
            UPLOAD SCREEN
-        ══════════════════════════════ */
+           ══════════════════════════════ */
         #upload-screen {
             position: fixed;
             inset: 0;
@@ -27,48 +47,54 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+            background: var(--neu-bg);
             z-index: 200;
         }
         .upload-box {
-            background: #fff;
+            background: var(--neu-card-bg);
+            border: 1px solid rgba(255,255,255,0.03);
             border-radius: 24px;
             padding: 48px 52px;
             text-align: center;
-            box-shadow: 0 24px 64px rgba(0,0,0,.12);
+            box-shadow: 15px 15px 30px var(--neu-card-shadow-dark), 
+                        -15px -15px 30px var(--neu-card-shadow-light);
             max-width: 520px;
             width: 90%;
         }
         .upload-box h2 {
             font-size: 28px;
             font-weight: 800;
-            color: #111;
+            color: #fff;
             margin: 12px 0 8px;
+            letter-spacing: -0.5px;
         }
         .upload-box p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 14px;
             line-height: 1.6;
             margin-bottom: 24px;
         }
         .upload-drop {
             display: block;
-            border: 2.5px dashed #fca5a5;
+            border: 2px dashed rgba(251, 191, 36, 0.3);
             border-radius: 16px;
             padding: 36px 24px;
             cursor: pointer;
-            transition: all .2s;
-            background: #fef2f2;
+            transition: all .2s ease;
+            background: #090d1a;
+            box-shadow: inset 4px 4px 8px #04050a, 
+                        inset -4px -4px 8px #151c35;
             text-decoration: none;
         }
         .upload-drop:hover {
-            border-color: #ef4444;
-            background: #fee2e2;
+            border-color: var(--royal-gold);
+            background: #0d1224;
         }
         .upload-drop .drop-icon { font-size: 40px; line-height: 1; margin-bottom: 10px; }
-        .upload-drop .drop-title { font-size: 15px; font-weight: 600; color: #374151; }
-        .upload-drop .drop-sub   { font-size: 12px; color: #9ca3af; margin-top: 4px; }
-        #fname { font-size: 13px; color: #ef4444; font-weight: 600; margin-top: 8px; min-height: 18px; }
+        .upload-drop .drop-title { font-size: 15px; font-weight: 600; color: #fff; }
+        .upload-drop .drop-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        #fname { font-size: 13px; color: var(--royal-gold); font-weight: 600; margin-top: 8px; min-height: 18px; }
+        
         .btn-open {
             display: flex;
             align-items: center;
@@ -77,29 +103,30 @@
             margin-top: 20px;
             width: 100%;
             padding: 14px;
-            background: #ef4444;
-            color: #fff;
+            background: linear-gradient(135deg, var(--royal-gold) 0%, var(--royal-gold-hover) 100%);
+            color: #05070d;
             border: none;
             border-radius: 12px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: background .15s, transform .15s;
+            box-shadow: 4px 4px 10px rgba(251, 191, 36, 0.15);
+            transition: all .15s ease;
         }
-        .btn-open:hover   { background: #dc2626; transform: translateY(-1px); }
-        .btn-open:disabled{ opacity: .5; cursor: not-allowed; transform: none; }
+        .btn-open:hover   { transform: translateY(-1px); box-shadow: 6px 6px 15px rgba(251, 191, 36, 0.25); }
+        .btn-open:disabled{ opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
         .upload-badges {
             display: flex;
             justify-content: center;
             gap: 24px;
             margin-top: 16px;
             font-size: 12px;
-            color: #9ca3af;
+            color: var(--text-secondary);
         }
 
         /* ══════════════════════════════
            EDITOR PAGE
-        ══════════════════════════════ */
+           ══════════════════════════════ */
         #editor-page {
             display: none;
             flex-direction: column;
@@ -107,7 +134,7 @@
             inset: 0;
             width: 100vw;
             height: 100vh;
-            background: #f5f5f5;
+            background: var(--neu-bg);
         }
 
         /* Top Bar */
@@ -115,12 +142,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
-            height: 52px;
-            background: #fff;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 0 20px;
+            height: 56px;
+            background: var(--neu-card-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
             gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .file-name {
             display: flex;
@@ -133,53 +161,59 @@
             outline: none;
             font-size: 14px;
             font-weight: 600;
-            color: #111;
+            color: #fff;
             background: transparent;
-            width: 220px;
+            width: 240px;
             border-bottom: 2px solid transparent;
             font-family: 'Inter', sans-serif;
             transition: border-color .2s;
         }
-        .file-name input:focus { border-bottom-color: #ef4444; }
-        .top-actions { display: flex; align-items: center; gap: 8px; }
+        .file-name input:focus { border-bottom-color: var(--royal-gold); }
+        .top-actions { display: flex; align-items: center; gap: 12px; }
+        
         .btn-dl {
-            display: flex; align-items: center; gap: 5px;
-            padding: 7px 16px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 9px 18px;
+            background: var(--neu-card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
-            color: #374151;
+            color: #fff;
             cursor: pointer;
-            transition: background .15s;
+            box-shadow: 3px 3px 6px var(--neu-card-shadow-dark), 
+                        -3px -3px 6px var(--neu-card-shadow-light);
+            transition: all .15s ease;
             font-family: 'Inter', sans-serif;
         }
-        .btn-dl:hover { background: #f9fafb; }
+        .btn-dl:hover { background: rgba(255,255,255,0.03); transform: translateY(-1px); }
+        .btn-dl:active { box-shadow: inset 3px 3px 6px var(--neu-card-shadow-dark); transform: translateY(1px); }
+
         .btn-done {
             display: flex; align-items: center; gap: 6px;
-            padding: 8px 22px;
-            background: #ef4444;
-            color: #fff;
+            padding: 9px 22px;
+            background: linear-gradient(135deg, var(--royal-gold) 0%, var(--royal-gold-hover) 100%);
+            color: #05070d;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: background .15s;
+            box-shadow: 3px 3px 6px var(--neu-card-shadow-dark);
+            transition: all .15s ease;
             font-family: 'Inter', sans-serif;
         }
-        .btn-done:hover { background: #dc2626; }
+        .btn-done:hover { transform: translateY(-1px); box-shadow: 4px 4px 10px rgba(251, 191, 36, 0.2); }
 
         /* Toolbar */
         #toolbar {
             display: flex;
             align-items: center;
-            gap: 2px;
-            padding: 0 12px;
+            gap: 4px;
+            padding: 0 16px;
             height: 52px;
-            background: #fff;
-            border-bottom: 1px solid #e5e7eb;
+            background: var(--neu-card-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
             overflow-x: auto;
         }
@@ -189,69 +223,89 @@
             align-items: center;
             justify-content: center;
             gap: 2px;
-            padding: 6px 10px;
-            min-width: 52px;
-            height: 46px;
+            padding: 6px 12px;
+            min-width: 56px;
+            height: 44px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: transparent;
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 10px;
-            font-weight: 500;
+            font-weight: 600;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
             white-space: nowrap;
-            transition: all .15s;
+            transition: all .15s ease;
         }
-        .tool-btn:hover  { background: #f3f4f6; color: #111; }
-        .tool-btn.active { background: #fef2f2; color: #ef4444; }
-        .tool-btn svg    { width: 20px; height: 20px; }
-        .tool-sep { width: 1px; height: 32px; background: #e5e7eb; margin: 0 4px; flex-shrink: 0; }
+        .tool-btn:hover  { background: rgba(255,255,255,0.03); color: #fff; }
+        .tool-btn.active { 
+            background: #090d1a; 
+            color: var(--royal-gold);
+            box-shadow: inset 3px 3px 6px #04050a, 
+                        inset -3px -3px 6px #151c35;
+        }
+        .tool-btn svg    { width: 18px; height: 18px; }
+        .tool-sep { width: 1px; height: 28px; background: rgba(255,255,255,0.08); margin: 0 6px; flex-shrink: 0; }
 
         /* Properties Bar */
         #prop-bar {
             display: none;
             align-items: center;
-            gap: 8px;
-            padding: 5px 16px;
-            min-height: 40px;
-            background: #fafafa;
-            border-bottom: 1px solid #e5e7eb;
+            gap: 12px;
+            padding: 6px 20px;
+            min-height: 44px;
+            background: #090d1a;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
             flex-wrap: wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
         #prop-bar.show { display: flex; }
-        #prop-bar label { font-size: 12px; color: #6b7280; }
+        #prop-bar label { font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
+        
         #prop-bar select,
         #prop-bar input[type=number] {
-            height: 28px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            height: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
             padding: 0 8px;
             font-size: 12px;
-            background: #fff;
+            background: var(--neu-card-bg);
+            color: #fff;
+            outline: none;
             font-family: 'Inter', sans-serif;
         }
-        #prop-font-family { width: 130px; }
-        #prop-font-size   { width: 52px; }
+        #prop-font-family { width: 140px; }
+        #prop-font-size   { width: 60px; }
+        
         .prop-btn {
-            display: flex; align-items: center;
-            height: 28px; padding: 0 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            height: 30px; min-width: 30px; padding: 0 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            background: var(--neu-card-bg);
+            color: #fff;
             font-size: 12px;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: background .12s;
+            box-shadow: 2px 2px 4px var(--neu-card-shadow-dark);
+            transition: all .12s ease;
         }
-        .prop-btn:hover { background: #f3f4f6; }
-        .prop-btn.on    { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .prop-btn:hover { background: rgba(255,255,255,0.03); }
+        .prop-btn.on    { 
+            background: var(--royal-gold); 
+            color: #05070d; 
+            border-color: var(--royal-gold); 
+            font-weight: bold;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
         input[type=color].cpick {
-            width: 28px; height: 28px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            width: 30px; height: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
             padding: 2px;
+            background: transparent;
             cursor: pointer;
         }
 
@@ -266,44 +320,49 @@
         /* Pages Panel */
         #pages-panel {
             display: none;
-            width: 170px;
-            background: #fff;
-            border-right: 1px solid #e5e7eb;
+            width: 180px;
+            background: var(--neu-card-bg);
+            border-right: 1px solid rgba(255,255,255,0.05);
             overflow-y: auto;
             flex-shrink: 0;
-            padding: 10px 8px;
+            padding: 14px 10px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
         #pages-panel.show { display: block; }
         #pages-panel .panel-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #374151;
-            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--royal-gold);
+            margin-bottom: 12px;
             padding: 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .page-thumb {
             border: 2px solid transparent;
-            border-radius: 6px;
-            margin-bottom: 8px;
+            border-radius: 8px;
+            margin-bottom: 12px;
             cursor: pointer;
             overflow: hidden;
-            transition: border-color .15s;
+            transition: all .15s ease;
+            background: #090d1a;
+            padding: 4px;
         }
-        .page-thumb:hover  { border-color: #fca5a5; }
-        .page-thumb.active { border-color: #ef4444; }
-        .page-thumb canvas { width: 100%; display: block; }
+        .page-thumb:hover  { border-color: rgba(251, 191, 36, 0.4); }
+        .page-thumb.active { border-color: var(--royal-gold); box-shadow: 0 0 12px rgba(251, 191, 36, 0.15); }
+        .page-thumb canvas { width: 100%; display: block; border-radius: 4px; }
         .page-thumb .pg-num {
             text-align: center;
             font-size: 11px;
-            color: #9ca3af;
-            padding: 3px;
-            background: #fff;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 4px 0 0;
         }
 
         /* Canvas Area */
         #canvas-area {
             flex: 1;
-            background: #525659;
+            background: #090d1a;
             overflow: auto;
             display: flex;
             justify-content: center;
@@ -311,14 +370,17 @@
             padding: 24px 16px 80px;
             position: relative;
             min-height: 0;
+            box-shadow: inset 4px 4px 10px rgba(0,0,0,0.4);
         }
         #page-wrap {
             position: relative;
             display: inline-block;
-            box-shadow: 0 8px 32px rgba(0,0,0,.4);
+            box-shadow: 0 12px 48px rgba(0,0,0,.6);
             line-height: 0;
+            border-radius: 4px;
+            overflow: visible;
         }
-        #pdf-canvas { display: block; }
+        #pdf-canvas { display: block; border-radius: 4px; }
 
         /* Text Layer */
         #text-layer {
@@ -337,16 +399,16 @@
             border: 1.5px solid transparent;
             border-radius: 2px;
             outline: none;
-            caret-color: #ef4444;
+            caret-color: var(--royal-gold);
             padding: 0 2px;
         }
         #text-layer span:hover {
-            background: rgba(239,68,68,.07);
-            border-color: rgba(239,68,68,.3);
+            background: rgba(251, 191, 36, 0.08);
+            border-color: rgba(251, 191, 36, 0.3);
         }
         #text-layer span.ed {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 3px rgba(239,68,68,.15);
+            border-color: var(--royal-gold) !important;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
             z-index: 10;
         }
 
@@ -360,7 +422,7 @@
         }
         .ann-highlight {
             position: absolute;
-            background: rgba(250,204,21,.45);
+            background: rgba(251, 191, 36, .35);
             pointer-events: auto;
             cursor: pointer;
             border-radius: 2px;
@@ -379,8 +441,8 @@
             padding: 2px 4px;
             line-height: 1.3;
         }
-        .ann-text:hover    { border-color: rgba(239,68,68,.5); }
-        .ann-text.selected { border-color: #ef4444; background: rgba(255,255,255,.92); cursor: text; }
+        .ann-text:hover    { border-color: rgba(251, 191, 36, .5); }
+        .ann-text.selected { border-color: var(--royal-gold); background: rgba(255,255,255,.95); cursor: text; }
 
         /* Draw Canvas */
         #draw-canvas {
@@ -393,141 +455,167 @@
         /* Bottom Navigation */
         #bottom-nav {
             position: absolute;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,.75);
-            backdrop-filter: blur(4px);
+            background: rgba(18, 23, 43, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             border-radius: 999px;
-            padding: 6px 16px;
+            padding: 8px 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             z-index: 20;
             white-space: nowrap;
         }
         #bottom-nav button {
             background: none;
             border: none;
-            color: #d1d5db;
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 14px;
-            padding: 4px 6px;
-            border-radius: 6px;
-            transition: background .12s;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all .12s;
             font-family: 'Inter', sans-serif;
         }
-        #bottom-nav button:hover    { background: rgba(255,255,255,.15); color: #fff; }
-        #bottom-nav button:disabled { opacity: .35; cursor: not-allowed; }
-        #page-indicator { color: #d1d5db; font-size: 13px; min-width: 52px; text-align: center; }
-        #zoom-lbl { color: #9ca3af; font-size: 12px; min-width: 36px; text-align: center; }
-        .nav-sep { width: 1px; height: 18px; background: rgba(255,255,255,.2); margin: 0 2px; }
+        #bottom-nav button:hover    { background: rgba(255,255,255,.05); color: #fff; }
+        #bottom-nav button:disabled { opacity: .3; cursor: not-allowed; }
+        #page-indicator { color: #fff; font-size: 13px; font-weight: 700; min-width: 64px; text-align: center; }
+        #zoom-lbl { color: var(--text-secondary); font-size: 12px; font-weight: 600; min-width: 44px; text-align: center; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,.1); margin: 0 4px; }
 
-        /* Spinner */
+        /* Spinner Overlay */
         #spinner {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,.5);
+            background: rgba(12, 15, 29, 0.85);
+            backdrop-filter: blur(4px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
         #spinner.show { display: flex; }
         .spin-ring {
-            width: 44px; height: 44px;
-            border: 4px solid rgba(255,255,255,.25);
-            border-top-color: #fff;
+            width: 48px; height: 48px;
+            border: 4px solid rgba(251, 191, 36, 0.1);
+            border-top-color: var(--royal-gold);
             border-radius: 50%;
-            animation: spin .7s linear infinite;
+            animation: spin .8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spin-text { color: #d1d5db; font-size: 14px; }
+        .spin-text { color: var(--royal-gold); font-size: 15px; font-weight: 700; text-shadow: 0 0 8px rgba(251,191,36,0.3); }
+
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
 
         /* Sign Modal */
         #sign-modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,.5);
+            background: rgba(0,0,0,.7);
+            backdrop-filter: blur(4px);
             z-index: 9998;
             align-items: center;
             justify-content: center;
         }
         #sign-modal.show { display: flex; }
+        
         .sign-box {
-            background: #fff;
+            background: var(--neu-card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 28px 32px;
             width: 440px;
             max-width: 90vw;
-            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
         }
-        .sign-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: #111; }
-        .sign-box p  { font-size: 13px; color: #6b7280; margin-bottom: 14px; }
+        .sign-box h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; color: #fff; }
+        .sign-box p  { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+        
         .sign-input {
             width: 100%;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px 12px;
+            background: #090d1a !important;
+            border: 1px solid rgba(255,255,255,0.05) !important;
+            border-radius: 10px;
+            padding: 12px 14px;
             font-size: 22px;
             font-style: italic;
             font-family: Georgia, serif;
             outline: none;
             transition: border-color .15s;
-            color: #1e3a8a;
+            color: var(--royal-gold) !important;
+            box-shadow: inset 3px 3px 6px #04050a;
         }
-        .sign-input:focus { border-color: #ef4444; }
+        .sign-input:focus { border-color: var(--royal-gold) !important; }
         .sign-actions {
             display: flex;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: 20px;
             justify-content: flex-end;
         }
         .btn-cancel {
-            padding: 8px 18px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            background: #fff;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            background: var(--neu-card-bg);
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
             font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
         }
+        .btn-cancel:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        
         .btn-add-sign {
-            padding: 8px 22px;
-            background: #ef4444;
-            color: #fff;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, var(--royal-gold) 0%, var(--royal-gold-hover) 100%);
+            color: #05070d;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
-            transition: background .15s;
+            transition: all .15s ease;
         }
-        .btn-add-sign:hover { background: #dc2626; }
+        .btn-add-sign:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(251,191,36,0.2); }
     </style>
 </head>
 <body>
 
 <div id="spinner">
     <div class="spin-ring"></div>
-    <div class="spin-text">Processing...</div>
+    <div class="spin-text" id="spinner-label">Processing PDF document...</div>
 </div>
 
 <div id="upload-screen">
     <div class="upload-box">
-        <div style="font-size:52px;line-height:1">✏️</div>
+        <div style="font-size:52px;line-height:1;margin-bottom:12px;">✏️</div>
         <h2>Edit PDF Online</h2>
-        <p>Click any text to edit it directly.<br>Add text, highlight, draw, sign and more.</p>
+        <p>Modify, sign, draw, highlight, or add custom texts to PDF pages natively inside your browser.</p>
 
         <label class="upload-drop" id="dropZone">
             <input type="file" id="fileIn" accept=".pdf" style="display:none">
             <div class="drop-icon">📂</div>
-            <div class="drop-title">Drop PDF here or click to browse</div>
-            <div class="drop-sub">Maximum file size: 100 MB</div>
+            <div class="drop-title">Drop PDF file here or browse</div>
+            <div class="drop-sub">Secure local parsing, max limit 100MB</div>
             <div id="fname"></div>
         </label>
 
@@ -536,9 +624,9 @@
         </button>
 
         <div class="upload-badges">
-            <span>🔒 100% Secure</span>
-            <span>🗑️ Auto deleted</span>
-            <span>⚡ Free forever</span>
+            <span>🔒 Secure sandbox</span>
+            <span>⚡ Zero logs</span>
+            <span>💎 Free</span>
         </div>
     </div>
 </div>
@@ -547,13 +635,13 @@
 
     <div id="top-bar">
         <div class="file-name">
-            <span>📄</span>
+            <span style="font-size:16px;">📄</span>
             <input type="text" id="file-name-input" value="document.pdf" spellcheck="false">
         </div>
         <div class="top-actions">
             <button class="btn-dl" onclick="downloadPdf()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width:2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
                           d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
                 </svg>
                 Download
@@ -648,27 +736,27 @@
     </div>
 
     <div id="prop-bar">
-    <label>Font:</label>
-    <select id="prop-font-family" onchange="applyTextProp()">
-        <option>Arial</option>
-        <option>Times New Roman</option>
-        <option>Courier New</option>
-        <option>Georgia</option>
-        <option>Verdana</option>
-        <option>Helvetica</option>
-    </select>
-    <label>Size:</label>
-    <input type="number" id="prop-font-size" value="14" min="6" max="96"
-        onchange="applyTextProp()" oninput="applyTextProp()">
-    <div class="tool-sep"></div>
-    <button class="prop-btn" id="pbold"   onclick="toggleProp('bold')"><b>B</b></button>
-    <button class="prop-btn" id="pitalic" onclick="toggleProp('italic')"><i>I</i></button>
-    <div class="tool-sep"></div>
-    <input type="color" class="cpick" id="prop-color"
-        value="#000000" onchange="applyTextProp()" oninput="applyTextProp()">
-    <div class="tool-sep"></div>
-    <button class="prop-btn" onclick="deleteActive()" style="color:#ef4444">🗑 Delete</button>
-</div>
+        <label>Font:</label>
+        <select id="prop-font-family" onchange="applyTextProp()">
+            <option>Arial</option>
+            <option>Times New Roman</option>
+            <option>Courier New</option>
+            <option>Georgia</option>
+            <option>Verdana</option>
+            <option>Helvetica</option>
+        </select>
+        <label>Size:</label>
+        <input type="number" id="prop-font-size" value="14" min="6" max="96"
+            onchange="applyTextProp()" oninput="applyTextProp()">
+        <div class="tool-sep"></div>
+        <button class="prop-btn" id="pbold"   onclick="toggleProp('bold')"><b>B</b></button>
+        <button class="prop-btn" id="pitalic" onclick="toggleProp('italic')"><i>I</i></button>
+        <div class="tool-sep"></div>
+        <input type="color" class="cpick" id="prop-color"
+            value="#000000" onchange="applyTextProp()" oninput="applyTextProp()">
+        <div class="tool-sep"></div>
+        <button class="prop-btn" onclick="deleteActive()" style="color:#ef4444;font-weight:700;">🗑 Delete</button>
+    </div>
 
     <div id="editor-body">
 
@@ -686,13 +774,13 @@
             </div>
 
             <div id="bottom-nav">
-                <button onclick="go(-1)" id="btn-prev" disabled>&#9650;</button>
+                <button onclick="go(-1)" id="btn-prev" disabled>▲</button>
                 <span id="page-indicator">1 / 1</span>
-                <button onclick="go(1)" id="btn-next" disabled>&#9660;</button>
+                <button onclick="go(1)" id="btn-next" disabled>▼</button>
                 <div class="nav-sep"></div>
-                <button onclick="changeZoom(-.25)" style="font-size:18px;font-weight:300">−</button>
+                <button onclick="changeZoom(-.25)" style="font-size:16px;">−</button>
                 <span id="zoom-lbl">100%</span>
-                <button onclick="changeZoom(.25)"  style="font-size:18px;font-weight:300">+</button>
+                <button onclick="changeZoom(.25)"  style="font-size:16px;">+</button>
             </div>
         </div>
     </div>
@@ -701,8 +789,8 @@
 <div id="sign-modal">
     <div class="sign-box">
         <h3>Add Signature</h3>
-        <p>Type your name as signature</p>
-        <input type="text" id="sign-input" class="sign-input" placeholder="Your signature...">
+        <p>Type your name as a signature below</p>
+        <input type="text" id="sign-input" class="sign-input" placeholder="Enter signature...">
         <div class="sign-actions">
             <button class="btn-cancel"   onclick="closeSignModal()">Cancel</button>
             <button class="btn-add-sign" onclick="addSignature()">Add Signature</button>
@@ -751,7 +839,7 @@ document.getElementById('dropZone').ondrop = e => {
 
 document.getElementById('openBtn').onclick = async () => {
     if(!selectedFile) return;
-    showSpinner();
+    showSpinner("Reading PDF Document...");
     try {
         const buf = await selectedFile.arrayBuffer();
         pdfDoc = await pdfjsLib.getDocument(buf).promise;
@@ -768,7 +856,10 @@ document.getElementById('openBtn').onclick = async () => {
 };
 
 /* ══════════════ SPINNER ══════════════ */
-const showSpinner = () => document.getElementById('spinner').classList.add('show');
+const showSpinner = (text) => {
+    document.getElementById('spinner-label').textContent = text || "Processing PDF...";
+    document.getElementById('spinner').classList.add('show');
+};
 const hideSpinner = () => document.getElementById('spinner').classList.remove('show');
 
 /* ══════════════ RENDER PAGE ══════════════ */
@@ -781,7 +872,7 @@ async function renderPage(n){
     document.querySelectorAll('.page-thumb').forEach(t =>
         t.classList.toggle('active', +t.dataset.page === n));
 
-    showSpinner();
+    showSpinner(`Rendering Page ${n}...`);
 
     const page = await pdfDoc.getPage(n);
     const vp   = page.getViewport({ scale: SCALE });
@@ -978,7 +1069,6 @@ function applyTextProp(){
     const fs = parseFloat(document.getElementById('prop-font-size').value);
     const c  = document.getElementById('prop-color').value;
 
-    // Edit text span
     if(curSpan && curSpanData){
         curSpanData.ff    = ff;
         curSpanData.fs    = fs;
@@ -990,7 +1080,6 @@ function applyTextProp(){
         curSpan.style.top        = (curSpanData.y - fs) + 'px';
     }
 
-    // Annotation text
     if(curAnn && curAnn.type === 'text'){
         curAnn.fontFamily = ff;
         curAnn.fontSize   = fs;
@@ -1033,7 +1122,6 @@ function toggleProp(t){
 }
 
 function deleteActive(){
-    // Delete focused text span
     if(curSpan && curSpanData){
         curSpanData.txt = '';
         curSpanData.mod = true;
@@ -1042,7 +1130,6 @@ function deleteActive(){
         pushHistory();
         return;
     }
-    // Delete selected annotation
     if(curAnn){
         const el = document.querySelector(`[data-id="${curAnn.id}"]`);
         if(el) el.remove();
@@ -1075,7 +1162,6 @@ function addTextClick(e){
     al.style.pointerEvents = 'auto';
     drawAnn(ann, al);
 
-    // Auto focus new text
     setTimeout(() => {
         const el = document.querySelector(`[data-id="${ann.id}"]`);
         if(el){ el.focus(); selectAll(el); }
@@ -1145,7 +1231,7 @@ function drawAnn(ann, layer){
         div.style.cssText =
             `left:${ann.x}px;top:${ann.y}px;` +
             `width:${ann.w}px;height:${ann.h}px;` +
-            `background:${ann.color || 'rgba(250,204,21,.45)'};`;
+            `background:${ann.color || 'rgba(251,191,36,.35)'};`;
         div.onclick = () => {
             if(currentTool === 'eraser'){ removeAnn(ann.id); div.remove(); }
         };
@@ -1193,7 +1279,7 @@ function setupHighlight(){
         hlDiv  = document.createElement('div');
         hlDiv.style.cssText =
             `position:absolute;left:${startX}px;top:${startY}px;` +
-            `width:0;height:22px;background:rgba(250,204,21,.5);` +
+            `width:0;height:22px;background:rgba(251,191,36,.4);` +
             `border-radius:2px;pointer-events:none;`;
         al.appendChild(hlDiv);
     };
@@ -1209,7 +1295,7 @@ function setupHighlight(){
             const ann = {
                 id: 'hl' + Date.now(), type: 'highlight',
                 x: startX, y: startY, w, h: 22,
-                color: 'rgba(250,204,21,.5)'
+                color: 'rgba(251,191,36,.4)'
             };
             if(!annStore[pNum]) annStore[pNum] = [];
             annStore[pNum].push(ann);
@@ -1357,7 +1443,7 @@ function addSignature(){
         text:       sig,
         fontSize:   32,
         fontFamily: 'Georgia, serif',
-        color:      '#1e3a8a',
+        color:      '#fbbf24',
         bold:       false,
         italic:     true
     };
@@ -1371,108 +1457,123 @@ function addSignature(){
     document.getElementById('sign-input').value = '';
 }
 
-/* ══════════════ DOWNLOAD ══════════════ */
+/* ══════════════ DOWNLOAD WITH STATE MANAGEMENT ══════════════ */
 async function downloadPdf(){
     savePage();
-    showSpinner();
+    
+    // Disable download actions
+    const btnDl = document.querySelector('.btn-dl');
+    const btnDone = document.querySelector('.btn-done');
+    const oldDlText = btnDl.innerHTML;
+    const oldDoneText = btnDone.innerHTML;
+    
+    btnDl.disabled = true;
+    btnDl.innerHTML = '<span class="spinner"></span> Working...';
+    btnDone.disabled = true;
+    btnDone.innerHTML = '⏳ Working...';
+
+    showSpinner("Building modified pages (1 of " + totP + ")...");
+    
     const { jsPDF } = window.jspdf;
     let pdf = null;
 
-    for(let p = 1; p <= totP; p++){
-        const page = await pdfDoc.getPage(p);
-        const vp   = page.getViewport({ scale: SCALE });
+    try {
+        for(let p = 1; p <= totP; p++){
+            showSpinner("Building page " + p + " of " + totP + "...");
+            const page = await pdfDoc.getPage(p);
+            const vp   = page.getViewport({ scale: SCALE });
 
-        const cv  = document.createElement('canvas');
-        cv.width  = vp.width;
-        cv.height = vp.height;
-        const ctx = cv.getContext('2d');
+            const cv  = document.createElement('canvas');
+            cv.width  = vp.width;
+            cv.height = vp.height;
+            const ctx = cv.getContext('2d');
 
-        // PDF render
-        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+            // Render PDF onto canvas
+            await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
-        // Koi modified text hai?
-        const mods = (store[p]||[]).filter(d => d.mod);
-
-        mods.forEach(d => {
-            ctx.save();
-
-            // Exact font set karo
-            let fnt = '';
-            if(d.italic) fnt += 'italic ';
-            if(d.bold)   fnt += 'bold ';
-            fnt += d.fs + 'px ' + d.ff;
-            ctx.font        = fnt;
-            ctx.textBaseline = 'alphabetic';
-
-            // Original aur new text ki width
-            const oW = ctx.measureText(d.orig || '').width;
-            const nW = ctx.measureText(d.txt  || '').width;
-
-            // PDF text ka exact bounding box calculate karo
-            // PDF mein text ka top = baseline - ascent
-            // ascent approx = 0.72 * fontSize
-            // descent approx = 0.22 * fontSize
-            const ascent  = d.fs * 0.72;
-            const descent = d.fs * 0.22;
-
-            // White out rect — sirf text area, 1px tight
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(
-                d.x,
-                d.y - ascent,
-                Math.max(oW, nW) + 1,
-                ascent + descent
-            );
-
-            // Naya text draw karo
-            if(d.txt && d.txt.trim()){
-                ctx.fillStyle = d.color || '#000000';
-                ctx.fillText(d.txt, d.x, d.y);
-            }
-
-            ctx.restore();
-        });
-
-        // Annotations
-        (annStore[p]||[]).forEach(ann => {
-            ctx.save();
-            if(ann.type === 'highlight'){
-                ctx.fillStyle   = ann.color || 'rgba(250,204,21,.45)';
-                ctx.fillRect(ann.x, ann.y, ann.w, ann.h);
-            } else if(ann.type === 'text' && ann.text){
+            // Apply modifications
+            const mods = (store[p]||[]).filter(d => d.mod);
+            mods.forEach(d => {
+                ctx.save();
                 let fnt = '';
-                if(ann.italic) fnt += 'italic ';
-                if(ann.bold)   fnt += 'bold ';
-                fnt += (ann.fontSize||14) + 'px ' + (ann.fontFamily||'Arial');
-                ctx.font         = fnt;
-                ctx.fillStyle    = ann.color || '#000';
-                ctx.textBaseline = 'top';
-                ctx.fillText(ann.text, ann.x, ann.y);
-            }
-            ctx.restore();
-        });
+                if(d.italic) fnt += 'italic ';
+                if(d.bold)   fnt += 'bold ';
+                fnt += d.fs + 'px ' + d.ff;
+                ctx.font        = fnt;
+                ctx.textBaseline = 'alphabetic';
 
-        // Drawings
-        if(drawStore[p]){
-            await new Promise(res => {
-                const img   = new Image();
-                img.onload  = () => { ctx.drawImage(img, 0, 0); res(); };
-                img.src     = drawStore[p];
+                const oW = ctx.measureText(d.orig || '').width;
+                const nW = ctx.measureText(d.txt  || '').width;
+
+                const ascent  = d.fs * 0.72;
+                const descent = d.fs * 0.22;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(d.x, d.y - ascent, Math.max(oW, nW) + 1, ascent + descent);
+
+                if(d.txt && d.txt.trim()){
+                    ctx.fillStyle = d.color || '#000000';
+                    ctx.fillText(d.txt, d.x, d.y);
+                }
+                ctx.restore();
             });
+
+            // Apply annotations
+            (annStore[p]||[]).forEach(ann => {
+                ctx.save();
+                if(ann.type === 'highlight'){
+                    ctx.fillStyle   = ann.color || 'rgba(251,191,36,.35)';
+                    ctx.fillRect(ann.x, ann.y, ann.w, ann.h);
+                } else if(ann.type === 'text' && ann.text){
+                    let fnt = '';
+                    if(ann.italic) fnt += 'italic ';
+                    if(ann.bold)   fnt += 'bold ';
+                    fnt += (ann.fontSize||14) + 'px ' + (ann.fontFamily||'Arial');
+                    ctx.font         = fnt;
+                    ctx.fillStyle    = ann.color || '#000';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(ann.text, ann.x, ann.y);
+                }
+                ctx.restore();
+            });
+
+            // Draw drawings
+            if(drawStore[p]){
+                await new Promise(res => {
+                    const img   = new Image();
+                    img.onload  = () => { ctx.drawImage(img, 0, 0); res(); };
+                    img.src     = drawStore[p];
+                });
+            }
+
+            const imgData = cv.toDataURL('image/png');
+            if(!pdf) pdf = new jsPDF({ unit:'pt', format:[vp.width, vp.height] });
+            else     pdf.addPage([vp.width, vp.height]);
+            pdf.addImage(imgData, 'PNG', 0, 0, vp.width, vp.height);
         }
 
-        // PNG — no compression artifacts
-        const imgData = cv.toDataURL('image/png');
-        if(!pdf) pdf = new jsPDF({ unit:'pt', format:[vp.width, vp.height] });
-        else     pdf.addPage([vp.width, vp.height]);
-        pdf.addImage(imgData, 'PNG', 0, 0, vp.width, vp.height);
+        showSpinner("Packing PDF file...");
+        const fn = document.getElementById('file-name-input').value.trim() || 'edited';
+        pdf.save(fn.endsWith('.pdf') ? fn : fn + '.pdf');
+
+        btnDl.innerHTML = '✅ Saved';
+        btnDone.innerHTML = '✓ Saved';
+        
+    } catch (e) {
+        console.error(e);
+        alert("Failed to build modified PDF: " + e.message);
+        btnDl.innerHTML = '❌ Failed';
+        btnDone.innerHTML = '❌ Failed';
     }
 
     hideSpinner();
-    const fn = document.getElementById('file-name-input').value.trim() || 'edited';
-    pdf.save(fn.endsWith('.pdf') ? fn : fn + '.pdf');
+    setTimeout(() => {
+        btnDl.disabled = false;
+        btnDl.innerHTML = oldDlText;
+        btnDone.disabled = false;
+        btnDone.innerHTML = oldDoneText;
+    }, 2500);
 }
-
 </script>
 </body>
 </html>
