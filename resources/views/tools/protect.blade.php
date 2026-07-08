@@ -8,7 +8,7 @@
     <form method="POST" action="/protect-pdf" enctype="multipart/form-data" class="mt-8">
         @csrf
         <label class="block border-2 border-dashed border-slate-600 hover:border-red-400 rounded-2xl p-10 cursor-pointer transition-colors">
-            <input type="file" name="file" accept=".pdf" class="hidden" onchange="document.getElementById('fn').textContent='✅ '+this.files[0].name" required>
+            <input type="file" name="files[]" accept=".pdf" multiple class="hidden" onchange="document.getElementById('fn').textContent='✅ Selected '+this.files.length+' file(s)'" required>
             <div class="text-5xl mb-3">📁</div>
             <p class="text-slate-300 font-semibold">Click to select PDF</p>
             <div id="fn" class="mt-3 text-sm text-green-400"></div>

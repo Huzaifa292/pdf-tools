@@ -1,35 +1,23 @@
 <x-app-layout>
-<x-slot name="title">PDFTools - Free Online PDF Tools</x-slot>
+<x-slot name="title">freepdfdoceditor - Free Online PDF Document Editor</x-slot>
 
 <!-- HERO -->
 <section class="text-center py-14" data-aos="fade-down">
     <div class="inline-block bg-red-50 text-red-600 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
-        100% Free • No Login Required
+        100% Free • No Signup Required
     </div>
     <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
-        Every PDF Tool You Need<br>
-        <span class="text-red-500">in One Place</span>
+        Free PDF Document Editor<br>
+        <span class="text-red-500">No Signup Required</span>
     </h1>
     <p class="text-gray-500 mt-4 text-lg max-w-2xl mx-auto">
-        Merge, split, compress, convert, rotate, watermark PDFs — fast, free, and secure.
+        The ultimate free online PDF editor. Merge, split, compress, convert, rotate, and watermark PDFs fast, secure, and 100% free.
     </p>
-    @auth
     <div class="mt-8 flex justify-center gap-3">
-        <a href="/dashboard" class="btn-animate ripple px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-base shadow-md transition">
-            Go to Dashboard →
+        <a href="#tools-grid" class="btn-animate ripple px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-base shadow-md transition">
+            Explore All PDF Tools ↓
         </a>
     </div>
-    @else
-    <div class="mt-8 flex justify-center gap-3">
-        <a href="{{ route('register') }}" class="btn-animate ripple px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-base shadow-md transition">
-            Create Free Account →
-        </a>
-        <a href="{{ route('login') }}" class="btn-animate px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl font-semibold text-base shadow-sm transition">
-            Login
-        </a>
-    </div>
-    <p class="text-gray-400 text-sm mt-3"> All tools work without login too</p>
-    @endauth
 </section>
 
 <!-- FILTER TABS -->

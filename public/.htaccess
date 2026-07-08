@@ -1,3 +1,6 @@
+# Run website under PHP 8.3 on StackCP/20i hosting
+AddHandler x-httpd-php83 .php
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

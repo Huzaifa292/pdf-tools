@@ -3,15 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfToolController;
 
-require __DIR__.'/auth.php';
+// require __DIR__.'/auth.php'; // Authentication disabled
 
 // Home
 Route::get('/', fn() => view('home'));
-
-// Dashboard - sirf logged in users ke liye
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
-});
 
 // ── PDF Tools - Sab bina login ke bhi kaam karte hain ────
 Route::get('/merge-pdf',      [PdfToolController::class, 'mergePage']);
@@ -67,6 +62,7 @@ Route::post('/organize-pdf',  [PdfToolController::class, 'organizeProcess']);
 
 Route::get('/edit-pdf',       [PdfToolController::class, 'editPage']);
 Route::post('/edit-pdf',      [PdfToolController::class, 'editProcess']);
+Route::get('/edit-pdf/download/{token}', [PdfToolController::class, 'editDownload'])->name('edit.download');
 
 Route::get('/crop-pdf',       [PdfToolController::class, 'cropPage']);
 Route::post('/crop-pdf',      [PdfToolController::class, 'cropProcess']);
@@ -90,3 +86,6 @@ Route::post('/remove-pages',  [PdfToolController::class, 'removePagesProcess']);
 Route::get('/word-to-text',          [PdfToolController::class, 'wordToTextPage']);
 Route::post('/word-to-text',         [PdfToolController::class, 'wordToTextProcess']);
 Route::get('/word-to-text/download', [PdfToolController::class, 'wordToTextDownload'])->name('word.text.download');
+
+// Contact Page
+Route::get('/contact', fn() => view('contact'))->name('contact');
